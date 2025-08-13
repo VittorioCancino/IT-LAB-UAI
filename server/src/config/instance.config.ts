@@ -15,7 +15,7 @@ export interface InstanceConfiguration {
 // IMPORTANTE: Modifica estos valores antes de desplegar
 export const INSTANCE_CONFIG: InstanceConfiguration = {
     // ID único de esta instancia (debe ser único en todo el sistema)
-    instanceId: "lab-instance-1",
+    instanceId: "FZ105_VINA",
 
     // Nombre descriptivo de esta instancia
     name: "Laboratorio informática Fz105",
