@@ -22,7 +22,7 @@ export const sendHeartbeat = async (): Promise<void> => {
 
     try {
         const response = await axios.post(
-            `${INSTANCE_CONFIG.mainServerUrl}/api/instances/register`,
+            `${INSTANCE_CONFIG.mainServerUrl}/api/instance/create-instance`,
             {
                 instanceId: INSTANCE_CONFIG.instanceId,
                 name: INSTANCE_CONFIG.name,
@@ -96,7 +96,7 @@ export const startHeartbeat = (): void => {
     // Enviar primer heartbeat inmediatamente
     sendHeartbeat();
 
-    // Configurar envío periódico 
+    // Configurar envío periódico
     heartbeatTimer = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
 
     console.log(
