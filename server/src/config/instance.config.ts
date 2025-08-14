@@ -8,6 +8,9 @@ export interface InstanceConfiguration {
     description: string;
     mainServerUrl: string;
     environment: "production" | "development" | "test";
+    inicialHour: string;
+    finalHour: string;
+    maxCapacity: number;
 }
 
 // CONFIGURACIÓN DE ESTA INSTANCIA
@@ -31,6 +34,16 @@ export const INSTANCE_CONFIG: InstanceConfiguration = {
 
     // Ambiente de esta instancia
     environment: "development",
+
+    // Hora de inicio del periodo laboral
+    inicialHour: "08:30",
+
+    // Hora de termino de la jornada laboral
+    finalHour: "17:30",
+
+    // Cantidad de cupos del laboratorio
+
+    maxCapacity: 10,
 };
 
 // CONFIGURACIÓN DEL HEARTBEAT
