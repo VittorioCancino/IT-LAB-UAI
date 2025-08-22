@@ -9,7 +9,7 @@ import {
     getLabUtilization,
     getMonthlyUtilization,
     getHourlyUtilization,
-} from "../controllers/Attendance.controller";
+} from "../controllers/Attendance.Controller";
 import { jwtAuth } from "../middleware/jwtAuth.middleware";
 import { forceAttendanceAutoCheckout } from "../scheduler/attendanceAutoCheckout";
 

@@ -1,5 +1,5 @@
-// Configuración de la instancia para el sistema de heartbeat
-// Modifica estos valores según la instancia específica
+import fs from "fs";
+import path from "path";
 
 export interface InstanceConfiguration {
     instanceId: string;
@@ -13,37 +13,83 @@ export interface InstanceConfiguration {
     maxCapacity: number;
 }
 
+export interface LabConfiguration {
+    inicialHour: string;
+    finalHour: string;
+    maxCapacity: number;
+    lastUpdated: string;
+    updatedBy: string;
+}
+
+const getLabConfig = (): LabConfiguration => {
+    try {
+        const configPath = path.join(__dirname, "instance-config.json");
+        const configData = fs.readFileSync(configPath, "utf8");
+        return JSON.parse(configData);
+    } catch (error) {
+        console.warn(
+            "[Config] No se pudo leer lab-config.json, usando valores por defecto",
+        );
+        return {
+            inicialHour: "08:30",
+            finalHour: "17:30",
+            maxCapacity: 10,
+            lastUpdated: new Date().toISOString(),
+            updatedBy: "system",
+        };
+    }
+};
+
+export const saveLabConfig = (config: Partial<LabConfiguration>): void => {
+    try {
+        const configPath = path.join(__dirname, "instance-config.json");
+        const currentConfig = getLabConfig();
+
+        const newConfig: LabConfiguration = {
+            ...currentConfig,
+            ...config,
+            lastUpdated: new Date().toISOString(),
+        };
+
+        fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 4));
+
+        // Actualizar configuración en memoria
+        labConfig = newConfig;
+
+        console.log(
+            "[Config] Configuración del laboratorio actualizada:",
+            newConfig,
+        );
+    } catch (error) {
+        console.error("[Config] Error al guardar configuración:", error);
+        throw new Error("No se pudo guardar la configuración");
+    }
+};
+
+let labConfig = getLabConfig();
+
 // CONFIGURACIÓN DE ESTA INSTANCIA
 // ================================
 // IMPORTANTE: Modifica estos valores antes de desplegar
 export const INSTANCE_CONFIG: InstanceConfiguration = {
-    // ID único de esta instancia (debe ser único en todo el sistema)
-    instanceId: "FZ105_VINA",
+    instanceId: process.env.INSTANCE_ID || "FZ105_VINA",
+    name: process.env.INSTANCE_NAME || "Laboratorio informática Fz105",
+    port: process.env.PORT || 3001,
+    description:
+        process.env.INSTANCE_DESCRIPTION || "Laboratorio de informática Fz105",
+    mainServerUrl: process.env.MAIN_SERVER_URL || "http://192.168.2.2:3002",
+    environment:
+        (process.env.NODE_ENV as "production" | "development" | "test") ||
+        "development",
 
-    // Nombre descriptivo de esta instancia
-    name: "Laboratorio informática Fz105",
+    // USAR CONFIGURACIÓN DINÁMICA DEL LABORATORIO
+    inicialHour: labConfig.inicialHour,
+    finalHour: labConfig.finalHour,
+    maxCapacity: labConfig.maxCapacity,
+};
 
-    // Puerto donde corre esta instancia (se toma de process.env.PORT si está disponible)
-    port: process.env.PORT,
-
-    // Descripción detallada de esta instancia
-    description: "Laboratorio de informática Fz105",
-
-    // URL del servidor principal (donde se registrará esta instancia)
-    mainServerUrl: "http://192.168.2.2:3002",
-
-    // Ambiente de esta instancia
-    environment: "development",
-
-    // Hora de inicio del periodo laboral
-    inicialHour: "08:30",
-
-    // Hora de termino de la jornada laboral
-    finalHour: "17:30",
-
-    // Cantidad de cupos del laboratorio
-
-    maxCapacity: 10,
+export const getLabConfiguration = (): LabConfiguration => {
+    return { ...labConfig };
 };
 
 // CONFIGURACIÓN DEL HEARTBEAT
@@ -95,6 +141,19 @@ export const validateInstanceConfig = (
     }
 
     return true;
+};
+
+export const updateLabConfiguration = (
+    updates: Partial<LabConfiguration>,
+): LabConfiguration => {
+    saveLabConfig(updates);
+
+    // Actualizar también INSTANCE_CONFIG
+    if (updates.inicialHour) INSTANCE_CONFIG.inicialHour = updates.inicialHour;
+    if (updates.finalHour) INSTANCE_CONFIG.finalHour = updates.finalHour;
+    if (updates.maxCapacity) INSTANCE_CONFIG.maxCapacity = updates.maxCapacity;
+
+    return getLabConfiguration();
 };
 
 // FUNCIÓN PARA OBTENER LA CONFIGURACIÓN ACTUAL

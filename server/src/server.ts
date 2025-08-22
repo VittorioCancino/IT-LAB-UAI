@@ -12,6 +12,7 @@ import { seedDefaultAdmin, seedDefaultReasons } from "./utils/dbSeeder.util";
 import { createDatabase } from "./utils/createDatabase";
 import { startHeartbeat } from "./utils/heartbeatClient";
 import heartbeatStatusRouter from "./routes/HeartbeatStatus.routes";
+import configurationRouter from "./routes/Config.routes";
 
 // Define Connection to the Data Base
 async function connectDB() {
@@ -55,5 +56,6 @@ server.use("/api/careers", careersRouter);
 server.use("/api/reasons", reasonsRouter);
 server.use("/api/attendance", attendanceRoutes);
 server.use("/api/heartbeat-status", heartbeatStatusRouter);
+server.use("/api/config", configurationRouter);
 
 export default server;

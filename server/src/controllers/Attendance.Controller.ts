@@ -2,11 +2,45 @@ import { Request, Response } from "express";
 import User from "../models/User.model";
 import Attendance from "../models/Attendance.model";
 import ReasonModel from "../models/Reason.model"; // Alias to avoid shadowing
+import { INSTANCE_CONFIG } from "../config/instance.config";
 
 // Utility function to safely parse date strings to avoid timezone issues
 const parseQueryDate = (dateString: string): Date => {
     const [year, month, day] = dateString.split("-").map(Number);
     return new Date(year, month - 1, day); // month is 0-indexed
+};
+
+// NEW: Utility function to parse time strings and create Date objects
+const parseTimeToDate = (targetDate: Date, timeString: string): Date => {
+    const [hours, minutes] = timeString.split(":").map(Number);
+    return new Date(
+        targetDate.getFullYear(),
+        targetDate.getMonth(),
+        targetDate.getDate(),
+        hours,
+        minutes,
+        0,
+    );
+};
+
+// NEW: Get working hours range from configuration
+const getWorkingHoursRange = (targetDate: Date) => {
+    const startOfDay = parseTimeToDate(targetDate, INSTANCE_CONFIG.inicialHour);
+    const endOfDay = parseTimeToDate(targetDate, INSTANCE_CONFIG.finalHour);
+
+    return { startOfDay, endOfDay };
+};
+
+// NEW: Generate working hours array dynamically
+const getWorkingHoursArray = (): number[] => {
+    const [startHour] = INSTANCE_CONFIG.inicialHour.split(":").map(Number);
+    const [endHour] = INSTANCE_CONFIG.finalHour.split(":").map(Number);
+
+    const hours: number[] = [];
+    for (let hour = startHour; hour <= endHour; hour++) {
+        hours.push(hour);
+    }
+    return hours;
 };
 
 // DTOs
@@ -207,22 +241,7 @@ export const getLabUtilization = async (req: Request, res: Response) => {
 
         const isToday = targetDate.toDateString() === new Date().toDateString();
 
-        const startOfDay = new Date(
-            targetDate.getFullYear(),
-            targetDate.getMonth(),
-            targetDate.getDate(),
-            8,
-            30,
-            0,
-        ); // 08:30
-        const endOfDay = new Date(
-            targetDate.getFullYear(),
-            targetDate.getMonth(),
-            targetDate.getDate(),
-            17,
-            30,
-            0,
-        ); // 17:30
+        const { startOfDay, endOfDay } = getWorkingHoursRange(targetDate);
 
         // For active sessions, use current time if viewing today, otherwise use end of day
         const currentTime = new Date();
@@ -241,8 +260,10 @@ export const getLabUtilization = async (req: Request, res: Response) => {
         });
 
         // Constants
-        const MAX_CAPACITY = 10;
-        const TOTAL_MINUTES = 9 * 60; // 9 hours * 60 minutes
+        const MAX_CAPACITY = INSTANCE_CONFIG.maxCapacity;
+
+        const workingMilliseconds = endOfDay.getTime() - startOfDay.getTime();
+        const TOTAL_MINUTES = workingMilliseconds / (1000 * 60);
         const MAX_POSSIBLE_MINUTES = MAX_CAPACITY * TOTAL_MINUTES;
 
         // Calculate utilization by minute
@@ -339,27 +360,19 @@ export const getMonthlyUtilization = async (req: Request, res: Response) => {
             }
         }
 
+        const { startOfDay: sampleStart, endOfDay: sampleEnd } =
+            getWorkingHoursRange(firstDay);
+        const TOTAL_MINUTES = Math.floor(
+            (sampleEnd.getTime() - sampleStart.getTime()) / (1000 * 60),
+        );
+        const MAX_CAPACITY = INSTANCE_CONFIG.maxCapacity;
+
         // Calculate utilization for each business day
         const dailyUtilizations = [];
         let totalMonthlyUtilizedMinutes = 0;
 
         for (const day of businessDays) {
-            const startOfDay = new Date(
-                day.getFullYear(),
-                day.getMonth(),
-                day.getDate(),
-                8,
-                30,
-                0,
-            );
-            const endOfDay = new Date(
-                day.getFullYear(),
-                day.getMonth(),
-                day.getDate(),
-                17,
-                30,
-                0,
-            );
+            const { startOfDay, endOfDay } = getWorkingHoursRange(day);
 
             // Get attendance records for this day
             const dayAttendances = await Attendance.findAll({
@@ -373,8 +386,6 @@ export const getMonthlyUtilization = async (req: Request, res: Response) => {
             });
 
             // Calculate daily utilization
-            const MAX_CAPACITY = 10;
-            const TOTAL_MINUTES = 9 * 60;
             let dailyUtilizedMinutes = 0;
 
             for (let minute = 0; minute < TOTAL_MINUTES; minute++) {
@@ -419,7 +430,8 @@ export const getMonthlyUtilization = async (req: Request, res: Response) => {
         }
 
         // Calculate monthly averages
-        const totalPossibleMinutes = businessDays.length * 10 * (9 * 60);
+        const totalPossibleMinutes =
+            businessDays.length * MAX_CAPACITY * TOTAL_MINUTES;
         const monthlyPercentage = Math.round(
             (totalMonthlyUtilizedMinutes / totalPossibleMinutes) * 100,
         );
@@ -483,22 +495,7 @@ export const getHourlyUtilization = async (req: Request, res: Response) => {
 
         const isToday = targetDate.toDateString() === new Date().toDateString();
 
-        const startOfDay = new Date(
-            targetDate.getFullYear(),
-            targetDate.getMonth(),
-            targetDate.getDate(),
-            8,
-            30,
-            0,
-        ); // 08:30
-        const endOfDay = new Date(
-            targetDate.getFullYear(),
-            targetDate.getMonth(),
-            targetDate.getDate(),
-            17,
-            30,
-            0,
-        ); // 17:30
+        const { startOfDay, endOfDay } = getWorkingHoursRange(targetDate);
 
         // For active sessions, use current time if viewing today, otherwise use end of day
         const currentTime = new Date();
@@ -517,8 +514,8 @@ export const getHourlyUtilization = async (req: Request, res: Response) => {
         });
 
         // Constants
-        const MAX_CAPACITY = 10;
-        const WORKING_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+        const MAX_CAPACITY = INSTANCE_CONFIG.maxCapacity;
+        const WORKING_HOURS = getWorkingHoursArray();
 
         const hourlyData = [];
 
