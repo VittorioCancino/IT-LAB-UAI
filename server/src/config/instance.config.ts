@@ -28,7 +28,7 @@ const getLabConfig = (): LabConfiguration => {
         return JSON.parse(configData);
     } catch (error) {
         console.warn(
-            "[Config] No se pudo leer lab-config.json, usando valores por defecto",
+            "[Config] No se pudo leer la configuración, usando valores por defecto",
         );
         return {
             inicialHour: "08:30",

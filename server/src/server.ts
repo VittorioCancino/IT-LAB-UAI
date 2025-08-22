@@ -34,19 +34,49 @@ async function connectDB() {
     }
 }
 
-// Establishing Connection
-connectDB();
+const corsOptions = {
+    origin: function (origin: string | undefined, callback: Function) {
+        // Permitir requests sin origin (como apps móviles, Postman, etc.)
+        if (!origin) return callback(null, true);
 
-// Start scheduled attendance auto-checkout
-startAttendanceAutoCheckout();
+        // En desarrollo, permitir cualquier origen
+        if (process.env.NODE_ENV === "development") {
+            return callback(null, true);
+        }
 
-// Start heartbeat system to register with main server
-startHeartbeat();
+        // En producción, puedes ser más específico
+        // Por ejemplo, solo permitir IPs de tu red local
+        const allowedOrigins = [
+            /^http:\/\/localhost:\d+$/, // localhost con cualquier puerto
+            /^http:\/\/127\.0\.0\.1:\d+$/, // 127.0.0.1 con cualquier puerto
+            /^http:\/\/192\.168\.\d+\.\d+:\d+$/, // Red local 192.168.x.x
+            /^http:\/\/10\.\d+\.\d+\.\d+:\d+$/, // Red local 10.x.x.x
+            // Agrega aquí dominios específicos si los tienes
+        ];
+
+        const isAllowed = allowedOrigins.some((pattern) =>
+            pattern.test(origin),
+        );
+        callback(null, isAllowed);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: ["Authorization"],
+};
+
+export const initializeServer = async () => {
+    await connectDB();
+    startAttendanceAutoCheckout();
+    startHeartbeat();
+    return server;
+};
 
 // Setting Up the Server
 const server = express();
 const cors = require("cors");
-server.use(cors());
+server.use(cors(corsOptions));
+server.options("*", cors(corsOptions));
 server.use(express.json());
 server.use("/api/users", usersRouter);
 server.use("/api/admins", adminsRouter);

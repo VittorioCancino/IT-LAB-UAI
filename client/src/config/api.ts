@@ -1,11 +1,17 @@
-// API configuration for handling both local and remote access
+const envApiUrl = import.meta.env.VITE_API_BASE_URL;
 
-/**
- * Determines the correct API base URL based on the current environment
- * @returns The appropriate base URL for API calls
- */
 export const getApiBaseUrl = (): string => {
-    // If we're running on localhost or 127.0.0.1, use localhost
+    // Primero verifica si hay una variable de entorno específica
+    if (import.meta.env.VITE_API_BASE_URL) {
+        return import.meta.env.VITE_API_BASE_URL;
+    }
+
+    // Si estamos en desarrollo y corriendo localmente
+    if (import.meta.env.DEV) {
+        return "http://localhost:3000/api";
+    }
+
+    // Para contenedores Docker, usar el nombre del servicio
     if (
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1"
@@ -13,12 +19,9 @@ export const getApiBaseUrl = (): string => {
         return "http://localhost:3000/api";
     }
 
-    // If we're on an external device, use the server's network IP
-    // Extract the IP from the current URL and assume the server is on the same network
+    // Si estamos en una red externa, construir la URL basada en el host actual
     const currentHost = window.location.hostname;
     const serverPort = "3000";
-
-    // Handle cases where the current URL might have a port
     const baseHost = currentHost.replace(/:\d+$/, "");
 
     return `http://${baseHost}:${serverPort}/api`;
@@ -27,5 +30,6 @@ export const getApiBaseUrl = (): string => {
 // Export the base URL for use in API configurations
 export const API_BASE_URL = getApiBaseUrl();
 
-// For debugging purposes, log the API URL being used
+// Para debugging
 console.log("API Base URL:", API_BASE_URL);
+console.log("Environment:", import.meta.env.MODE);
