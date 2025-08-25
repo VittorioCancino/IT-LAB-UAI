@@ -103,6 +103,19 @@ export const startHeartbeat = (): void => {
         `[Heartbeat] Timer configurado para enviar heartbeat cada ${HEARTBEAT_INTERVAL / 60000} minutos`,
     );
     console.log(`[Heartbeat] Ambiente: ${INSTANCE_CONFIG.environment}`);
+
+    // Manejar cierre graceful del proceso
+    process.on("SIGINT", () => {
+        console.log(`[Heartbeat] Recibido SIGINT, deteniendo heartbeat...`);
+        stopHeartbeat();
+        process.exit(0);
+    });
+
+    process.on("SIGTERM", () => {
+        console.log(`[Heartbeat] Recibido SIGTERM, deteniendo heartbeat...`);
+        stopHeartbeat();
+        process.exit(0);
+    });
 };
 
 /**
@@ -135,19 +148,6 @@ export const manualHeartbeat = async (): Promise<void> => {
 export const getInstanceConfig = () => {
     return getCurrentConfig();
 };
-
-// Manejar cierre graceful del proceso
-process.on("SIGINT", () => {
-    console.log(`[Heartbeat] Recibido SIGINT, deteniendo heartbeat...`);
-    stopHeartbeat();
-    process.exit(0);
-});
-
-process.on("SIGTERM", () => {
-    console.log(`[Heartbeat] Recibido SIGTERM, deteniendo heartbeat...`);
-    stopHeartbeat();
-    process.exit(0);
-});
 
 export default {
     startHeartbeat,

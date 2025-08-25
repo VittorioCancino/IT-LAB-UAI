@@ -17,4 +17,4 @@ COPY --from=build /app/dist ./dist
 COPY src/config/instance-config.json ./dist/config/
 EXPOSE 3000
 # Ajusta si tu entry real difiere
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/index.js"]

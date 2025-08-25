@@ -65,12 +65,12 @@ const corsOptions = {
     exposedHeaders: ["Authorization"],
 };
 
-export const initializeServer = async () => {
+export async function initializeServer() {
     await connectDB();
     startAttendanceAutoCheckout();
-    startHeartbeat();
+    //startHeartbeat();
     return server;
-};
+}
 
 // Setting Up the Server
 const server = express();
