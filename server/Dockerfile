@@ -10,6 +10,17 @@ RUN npx tsc
 # Runtime: solo prod deps + dist
 FROM node:20-bookworm
 WORKDIR /app
+
+# Configurar zona horaria de Chile continental
+ENV TZ=America/Santiago
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Establecer variables de entorno
+ENV NODE_ENV=$NODE_ENV
+ENV JWT_SECRET=$JWT_SECRET
+ENV ROUTE=$ROUTE
+ENV HOST=$HOST
+
 ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci --omit=dev
