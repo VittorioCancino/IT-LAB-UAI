@@ -17,9 +17,8 @@ function App() {
         <BrowserRouter basename={APP_PREFIX}>
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Verification />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/verification" element={<Verification />} />
 
             {/* Protected routes */}
             <Route element={<PrivateRoute />}>

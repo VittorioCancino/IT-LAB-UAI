@@ -84,15 +84,6 @@ export default function Navbar() {
         >
           <a
             onClick={() => {
-              navigate("/");
-              setMenuOpen(false);
-            }}
-            className="text-white hover:text-blue-200 font-medium cursor-pointer"
-          >
-            Home Page
-          </a>
-          <a
-            onClick={() => {
               navigate("/verification");
               setMenuOpen(false);
             }}
@@ -100,38 +91,6 @@ export default function Navbar() {
           >
             Verification
           </a>
-          <a
-            href="/about"
-            className="text-white hover:text-blue-200 font-medium"
-            onClick={() => setMenuOpen(false)}
-          >
-            About Us
-          </a>
-          <a href="#" className="text-white hover:text-blue-200 font-medium">
-            Contact Us
-          </a>
-          <div className="relative">
-            <button
-              onClick={handleMore}
-              className="flex items-center text-white hover:text-blue-200 font-medium focus:outline-none"
-            >
-              More Links
-              <svg
-                className="ml-1 w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-            {/* Dropdown content can be added here */}
-          </div>
         </div>
         {/* Right: Login/Logout */}
         <div className="hidden lg:flex items-center space-x-4">

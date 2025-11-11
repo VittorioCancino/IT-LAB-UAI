@@ -17,7 +17,7 @@ export async function loginAdmin(
   credentials: AdminLoginCredentials,
 ): Promise<AdminLoginResponse> {
   const currentHostname = window.location.hostname;
-  console.log("Current page hostname:", currentHostname);
+  //console.log("Current page hostname:", currentHostname);
   const response = await API_Login.post<AdminLoginResponse>(
     "/admin-login",
     credentials,
