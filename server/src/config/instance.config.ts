@@ -75,17 +75,16 @@ export const INSTANCE_CONFIG: InstanceConfiguration = {
   instanceId: process.env.INSTANCE_ID,
   name: process.env.INSTANCE_NAME,
   route: process.env.ROUTE,
-  description:
-    process.env.INSTANCE_DESCRIPTION,
+  description: process.env.INSTANCE_DESCRIPTION,
   mainServerUrl: process.env.MAIN_SERVER_URL || "http://192.168.2.140/sa_api",
   environment:
     (process.env.NODE_ENV as "production" | "development" | "test") ||
     "development",
 
   // USAR CONFIGURACIÓN DINÁMICA DEL LABORATORIO
-  inicialHour: labConfig.inicialHour,
-  finalHour: labConfig.finalHour,
-  maxCapacity: labConfig.maxCapacity,
+  inicialHour: process.env.INSTANCE_INICIAL_HOUR,
+  finalHour: process.env.INSTANCE_FINAL_HOUR,
+  maxCapacity: parseInt(process.env.INSTANCE_MAX_CAPACITY),
 };
 
 export const getLabConfiguration = (): LabConfiguration => {
@@ -179,3 +178,9 @@ console.log(
   `[Instance Config] Servidor Principal: ${INSTANCE_CONFIG.mainServerUrl}`,
 );
 console.log(`[Instance Config] Ambiente: ${INSTANCE_CONFIG.environment}`);
+console.log(
+  `[Instance Config] Horario: ${INSTANCE_CONFIG.inicialHour} - ${INSTANCE_CONFIG.finalHour}`,
+);
+console.log(
+  `[Instance Config] Capacidad Máxima: ${INSTANCE_CONFIG.maxCapacity}`,
+);

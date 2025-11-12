@@ -1,5 +1,7 @@
 import React from "react";
 
+const APP_PREFIX = import.meta.env.VITE_APP_PREFIX || "";
+
 export default function Navbar() {
   return (
     <>
@@ -8,7 +10,7 @@ export default function Navbar() {
           <div className="absolute left-0 px-4">
             <a href="/lab/">
               <img
-                src="/logo_holder.png"
+                src={`/lab/CA_logo.png`}
                 alt="Logo"
                 className="h-20 w-auto"
               />{" "}

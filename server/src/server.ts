@@ -66,8 +66,11 @@ const corsOptions = {
 
 export async function initializeServer() {
   await connectDB();
+
   startAttendanceAutoCheckout();
-  startHeartbeat();
+  if (process.env.NODE_ENV !== "development") {
+    startHeartbeat();
+  }
   return server;
 }
 

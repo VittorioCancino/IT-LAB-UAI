@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 
+const APP_PREFIX = import.meta.env.VITE_APP_PREFIX || "";
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
@@ -46,9 +48,9 @@ export default function Navbar() {
         <div className="flex items-center">
           <a href="/lab/" className="font-bold text-2xl text-white">
             <img
-              src="/logo_holder.png"
+              src={`/lab/CA_logo_trans.png`}
               alt="LAB Control Logo"
-              className="h-10 w-auto transition-all duration-300"
+              className="h-10 w-auto filter invert brightness-0"
             />
           </a>
         </div>
