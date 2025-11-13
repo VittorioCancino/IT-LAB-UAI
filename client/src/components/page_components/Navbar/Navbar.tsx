@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 
 const APP_PREFIX = import.meta.env.VITE_APP_PREFIX || "";
+const INSTANCE_NAME = import.meta.env.VITE_INSTANCE_NAME || "IT-LAB-UAI";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,13 +46,22 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between px-6 py-4">
         {/* Left: Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <a href="/lab/" className="font-bold text-2xl text-white">
             <img
               src={`/lab/CA_logo_trans.png`}
               alt="LAB Control Logo"
-              className="h-10 w-auto filter invert brightness-0"
+              className="h-16 w-auto filter invert brightness-0"
             />
+          </a>
+          <a
+            onClick={() => {
+              navigate("/");
+              setMenuOpen(false);
+            }}
+            className="text-white hover:text-blue-200 font-medium cursor-pointer text-xl"
+          >
+            {INSTANCE_NAME}
           </a>
         </div>
         {/* Hamburger for mobile */}

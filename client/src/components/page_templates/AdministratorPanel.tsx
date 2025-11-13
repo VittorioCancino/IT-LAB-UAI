@@ -13,6 +13,7 @@ import RolesManagement from "../page_components/AdministratorPanel/Roles/RolesMa
 import ReasonsManagement from "../page_components/AdministratorPanel/Reasons/ReasonsManagement";
 import AdminsManagement from "../page_components/AdministratorPanel/Admins/AdminsManagement";
 import VerificationButtons from "../page_components/Verification/VerificationButtons";
+import ActiveUsersTable from "../page_components/AdministratorPanel/Dashboard/ActiveUsersTable";
 
 export default function AdministratorPanel() {
   const { isAuthenticated, adminId, userId } = useAuth();
@@ -106,8 +107,15 @@ export default function AdministratorPanel() {
               <Route
                 path="/verification"
                 element={
-                  <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-                    <VerificationButtons />
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Verification Buttons - Takes 2 columns */}
+                    <div className="lg:col-span-2 flex items-center justify-center">
+                      <VerificationButtons />
+                    </div>
+                    {/* Active Users - Takes 1 column */}
+                    <div className="lg:col-span-1">
+                      <ActiveUsersTable />
+                    </div>
                   </div>
                 }
               />
