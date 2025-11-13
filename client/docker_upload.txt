@@ -1,0 +1,4 @@
+cd IT-LAB-UAI/client
+docker build -t mateotaito/it-lab-uai-client:1.0.24 .
+docker login
+docker push mateotaito/it-lab-uai-client:1.0.24
